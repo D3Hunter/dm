@@ -76,6 +76,7 @@ func NewConfig() *Config {
 	fs.StringVar(&cfg.SSLCert, "ssl-cert", "", "path of file that contains X509 certificate in PEM format for connection")
 	fs.StringVar(&cfg.SSLKey, "ssl-key", "", "path of file that contains X509 key in PEM format for connection")
 	fs.Var(&cfg.CertAllowedCN, "cert-allowed-cn", "the trusted common name that allowed to visit")
+	fs.IntVar(&cfg.RefreshFileInterval, "refresh", 10, "refresh interval")
 
 	return cfg
 }
@@ -104,6 +105,7 @@ type Config struct {
 
 	printVersion      bool
 	printSampleConfig bool
+	RefreshFileInterval int
 }
 
 // Clone clones a config.

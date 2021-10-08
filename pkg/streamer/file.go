@@ -280,7 +280,7 @@ func needSwitchSubDir(ctx context.Context, relayDir, currentUUID string, switchC
 		uuids          []string
 	)
 
-	ticker := time.NewTicker(watcherInterval)
+	ticker := time.NewTicker(WatcherInterval)
 	defer func() {
 		ticker.Stop()
 		if err != nil {

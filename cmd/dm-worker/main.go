@@ -16,10 +16,12 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/pingcap/dm/pkg/streamer"
 	"os"
 	"os/signal"
 	"strings"
 	"syscall"
+	"time"
 
 	"github.com/pingcap/errors"
 	globalLog "github.com/pingcap/log"
@@ -73,6 +75,8 @@ func main() {
 		syscall.SIGINT,
 		syscall.SIGTERM,
 		syscall.SIGQUIT)
+
+	streamer.WatcherInterval = time.Duration(cfg.RefreshFileInterval * int(time.Millisecond))
 
 	s := worker.NewServer(cfg)
 	err = s.JoinMaster(worker.GetJoinURLs(cfg.Join))

@@ -52,7 +52,7 @@ type Meta struct {
 }
 
 // polling interval for watcher.
-var watcherInterval = 100 * time.Millisecond
+var WatcherInterval = 10 * time.Millisecond
 
 // BinlogReaderConfig is the configuration for BinlogReader.
 type BinlogReaderConfig struct {
@@ -91,6 +91,8 @@ func NewBinlogReader(logger log.Logger, cfg *BinlogReaderConfig) *BinlogReader {
 	if cfg.Timezone != nil {
 		parser.SetTimestampStringLocation(cfg.Timezone)
 	}
+
+	fmt.Println("current refresh interval,", WatcherInterval)
 
 	newtctx := tcontext.NewContext(ctx, logger.WithFields(zap.String("component", "binlog reader")))
 
@@ -595,7 +597,7 @@ func (r *BinlogReader) parseFile(
 	wg.Add(1)
 	go func(latestPos int64) {
 		defer wg.Done()
-		relayLogUpdatedOrNewCreated(newCtx, watcherInterval, relayLogDir, fullPath, relayLogFile, latestPos, updatePathCh, updateErrCh)
+		relayLogUpdatedOrNewCreated(newCtx, WatcherInterval, relayLogDir, fullPath, relayLogFile, latestPos, updatePathCh, updateErrCh)
 	}(latestPos)
 
 	select {
@@ -603,7 +605,7 @@ func (r *BinlogReader) parseFile(
 		return false, false, 0, "", "", false, nil
 	case switchResp := <-switchCh:
 		// wait to ensure old file not updated
-		pathUpdated := utils.WaitSomething(3, watcherInterval, func() bool { return len(updatePathCh) > 0 })
+		pathUpdated := utils.WaitSomething(3, WatcherInterval, func() bool { return len(updatePathCh) > 0 })
 		if pathUpdated {
 			// re-parse it
 			return false, true, latestPos, "", "", replaceWithHeartbeat, nil
